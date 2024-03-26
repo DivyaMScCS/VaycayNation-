@@ -1,0 +1,94 @@
+---
+title: "trafic"
+author: "divi"
+date: "13 March 2024"
+output: html_document
+---
+
+
+```{r}
+trafic<-read.csv("raw data/W20331-XLS-ENG.csv" ,header = TRUE , sep =';')
+str(trafic)
+```
+
+```{r}
+trafic$Spot1 <- ifelse(trafic$Spot == 1, 1, 0)
+trafic$Spot2 <- ifelse(trafic$Spot == 2, 1, 0)
+trafic$Spot3 <- ifelse(trafic$Spot == 3, 1, 0)
+trafic$Spot4 <- ifelse(trafic$Spot == 4, 1, 0)
+trafic$Spot5 <- ifelse(trafic$Spot == 5, 1, 0)
+trafic$Spot6 <- ifelse(trafic$Spot == 6, 1, 0)
+trafic$Spot7 <- ifelse(trafic$Spot == 7, 1, 0)
+str(trafic)
+```
+
+```{r}
+trafic$VisitsDiff2 = trafic$AfterVisits2 - trafic$BeforeVisits2
+trafic$VisitsDiff20 = trafic$AfterVisits20 - trafic$BeforeVisits20
+str(trafic)
+```
+
+```{r}
+model1 <- lm(VisitsDiff2 ~ Spot1 + Spot2 + Spot3 + Spot4 + Spot5 + Spot6, data = trafic)
+summary(model1)
+```
+
+```{r}
+model2 <- lm(VisitsDiff2 ~ Spot1 + Spot2 + Spot3 + Spot4 + Spot5 + Spot6 + Channel , data = trafic)
+summary(model2)
+```
+
+```{r}
+model3 <- lm(VisitsDiff2 ~ Spot1 + Spot2 + Spot3 + Spot4 + Spot5 + Spot6 + Channel + Genre, data = trafic)
+summary(model3)
+```
+
+```{r}
+trafic$StartSpot <- strptime(as.character(trafic$StartSp), format = '%Y-%m-%dT%H:%M: %S')
+trafic$Weekday <- weekdays(trafic$StartSpot)
+str(trafic)
+```
+
+```{r}
+trafic$PrimeTimeSpot <- ifelse(trafic$StartSpot$hour == 20 | trafic$StartSpot$hour == 21,1,0)
+
+str(trafic)
+```
+
+```{r}
+#Regression model (results stored in model4)
+model4 <- lm(VisitsDiff2 ~ Spot1 + Spot2 + Spot3 + Spot4 + Spot5 + Spot6 + Channel + Genre + Weekday + PrimeTimeSpot, data = trafic)
+
+#Show regression results
+summary(model4)
+```
+
+```{r}
+#Regression model: omitted variable: Spot1 - Spot6 (results stored in model4)
+model41 <- lm(VisitsDiff2 ~ Channel + Genre + Weekday + PrimeTimeSpot, data = trafic)
+
+#Show regression results
+summary(model41)
+```
+
+```{r}
+model42 <- lm(VisitsDiff2 ~ Spot1 + Spot2 + Spot3 + Spot4 + Spot5 + Spot6 + Weekday + PrimeTimeSpot, data = trafic)
+
+#Show regression results
+summary(model42)
+```
+
+```{r}
+#Regression model: omitted variable: Weekday and prime time spot (results stored in model4)
+model43 <- lm(VisitsDiff2 ~ Spot1 + Spot2 + Spot3 + Spot4 + Spot5 + Spot6 + Channel + Genre, data = trafic)
+
+#Show regression results
+summary(model43)
+```
+
+
+
+
+
+
+
